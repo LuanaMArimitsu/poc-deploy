@@ -3,8 +3,6 @@
 ##
 ## Get latest from `dotnet new gitignore`
 
-#**/Tools/ffmpeg.exe
-
 # dotenv files
 .env
 
