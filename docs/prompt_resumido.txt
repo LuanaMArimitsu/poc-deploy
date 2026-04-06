@@ -1,0 +1,58 @@
+﻿Classifique a conversa de concessionária recebida e retorne SOMENTE JSON válido.
+
+Analise:
+- intenção comercial ou pós-venda
+- estágio do lead
+- tags aplicáveis
+- alertas
+- estado temporal da conversa
+- ação recomendada
+
+Considere:
+- conteúdo completo da conversa
+- sender_role: customer, seller, bot, system
+- timestamps de cada mensagem
+- current_datetime
+
+Categorias possíveis:
+intencao_compra, qualificacao_comercial, negociacao_avanco, pos_venda_servicos, fluxo_atendimento, estado_conversa, risco_alerta, problema_operacional, outros_contatos
+
+Tags possíveis:
+interesse_veiculo_novo, interesse_seminovo, consulta_modelo_especifico, consulta_preco, consulta_disponibilidade, veiculo_na_troca, interesse_financiamento, interesse_consorcio, cliente_taxista, cliente_pcd, agendamento_visita_loja, interesse_test_drive, envio_documentos, avaliacao_veiculo_usado, negociacao_pagamento, consulta_servico, agendamento_revisao, consulta_pecas, diagnostico_problema_veiculo, atendimento_bot_inicial, transferencia_setor, solicitacao_vendedor_especifico, direcionamento_filial, aguardando_resposta_vendedor, aguardando_resposta_cliente, lead_sem_interacao, lead_esfriando, followup_recomendado, negociacao_ativa, conversa_encerrada_natural, conversa_finalizada_vendedor, lead_abandonado, cliente_impaciente, risco_perda_cliente, cliente_desiste, lead_em_risco, falha_fluxo_bot, loop_fluxo_bot, mensagem_nao_suportada, conversa_teste, parceiro_terceiro, lead_campanha_marketing, solicitacao_informacao
+
+Regras temporais:
+- última mensagem do cliente sem resposta do vendedor: aguardando_resposta_vendedor
+- última mensagem do vendedor sem resposta do cliente: aguardando_resposta_cliente
+- 24h sem interação: lead_sem_interacao
+- 72h+ após follow-up sem resposta: lead_abandonado
+- conversa recente com próximos passos: negociacao_ativa
+- agradecimento/fechamento sem pendência: conversa_encerrada_natural
+- atraso do vendedor com pergunta/interesse aberto: lead_em_risco
+
+Formato de saída:
+{
+  "conversation_id": "string",
+  "primary_category": "string",
+  "secondary_categories": ["string"],
+  "tags": ["string"],
+  "alerts": ["string"],
+  "lead_status": "novo_lead|em_qualificacao|em_negociacao|proposta_enviada|visita_agendada|documentacao_pendente|pos_venda|aguardando_cliente|aguardando_vendedor|encerrado|perdido|teste",
+  "lead_temperature": "cold|warm|hot",
+  "priority": "low|medium|high|critical",
+  "recommended_action": "string",
+  "recommended_action_reason": "string",
+  "confidence": 0.0,
+  "time_analysis": {
+    "last_sender_role": "customer|seller|bot|system",
+    "hours_since_last_message": 0.0,
+    "has_open_customer_question": true,
+    "has_open_seller_question": false,
+    "is_waiting_on": "customer|seller|none",
+    "temporal_state_summary": "string"
+  },
+  "evidence": {
+    "key_signals": ["string"],
+    "last_customer_intent": "string",
+    "last_meaningful_message_summary": "string"
+  }
+}

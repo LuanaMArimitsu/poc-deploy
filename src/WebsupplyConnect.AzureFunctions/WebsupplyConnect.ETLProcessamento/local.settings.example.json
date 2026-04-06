@@ -1,0 +1,15 @@
+{
+  "IsEncrypted": false,
+  "Values": {
+    "AzureWebJobsStorage": "UseDevelopmentStorage=true",
+    "FUNCTIONS_WORKER_RUNTIME": "dotnet-isolated",
+    "DefaultConnection": "Server=tcp:websupplysql.database.windows.net,1433;Initial Catalog=websupplyconnect_prd;User ID=wsconnectusr;Password=Hands@23on;Persist Security Info=False;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;",
+    "ETL:UpdateIntervalMinutes": "30",
+    "ETL:CronExpression": "0 */30 * * * *",
+    "ETL:DiasEstagnada": "30",
+    "ETL:PrimeiraExecucaoDias": "30",
+    "ETL:TamanhoBatch": "1000",
+    "ETL:JanelaSegurancaHoras": "1",
+    "ETL:ExecucaoDiariaDias": "90"
+  }
+}

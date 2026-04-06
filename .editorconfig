@@ -1,0 +1,29 @@
+# Diretrizes de código - WebsupplyConnect
+# https://editorconfig.org
+
+root = true
+
+[*]
+charset = utf-8
+indent_style = space
+indent_size = 4
+end_of_line = lf
+insert_final_newline = true
+trim_trailing_whitespace = true
+
+[*.cs]
+dotnet_sort_system_directives_first = true
+dotnet_separate_import_directive_groups = false
+
+# Nullable reference types - preferir correções explícitas
+dotnet_diagnostic.CS8618.severity = suggestion
+dotnet_diagnostic.CS8602.severity = suggestion
+dotnet_diagnostic.CS8603.severity = suggestion
+dotnet_diagnostic.CS8604.severity = suggestion
+dotnet_diagnostic.CS8601.severity = suggestion
+dotnet_diagnostic.CS8629.severity = suggestion
+
+# Variáveis não usadas - sempre corrigir
+dotnet_diagnostic.CS0168.severity = warning
+dotnet_diagnostic.CS0649.severity = warning
+dotnet_diagnostic.CS9113.severity = warning

@@ -1,0 +1,9 @@
+{
+  "profiles": {
+    "WebsupplyConnect.WhatsAppMidiaEnvio": {
+      "commandName": "Project",
+      "commandLineArgs": "--port 7267",
+      "launchBrowser": false
+    }
+  }
+}

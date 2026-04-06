@@ -1,0 +1,21 @@
+{
+  "version": "2.0",
+  "logging": {
+    "logLevel": {
+      "Default": "Warning",
+      "WebsupplyConnect": "Information",
+      "Function": "Warning",
+      "Host.Results": "Warning",
+      "Host.Aggregator": "Warning",
+      "Microsoft": "Warning",
+      "Microsoft.EntityFrameworkCore": "Warning"
+    },
+    "applicationInsights": {
+      "samplingSettings": {
+        "isEnabled": true,
+        "excludedTypes": "Request"
+      },
+      "enableLiveMetricsFilters": true
+    }
+  }
+}

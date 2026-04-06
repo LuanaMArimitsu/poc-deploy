@@ -1,0 +1,912 @@
+{
+    "version": "1.0",
+    "language": "pt-BR",
+    "language_rules": {
+      "output_language": "pt-BR",
+      "mandatory": true,
+      "description": "Todos os campos de texto da saida JSON devem ser obrigatoriamente em portugues do Brasil (pt-BR). Campos como recommended_action, recommended_action_reason, temporal_state_summary e alerts nunca devem conter texto em ingles ou outro idioma."
+    },
+    "context": "Classificacao de conversas entre clientes e concessionaria no contexto comercial, pos-venda, atendimento, follow-up e risco de perda",
+    "ai_input_fields_expected": [
+      "conversation_id",
+      "message_id",
+      "sender_role",
+      "message_text",
+      "message_datetime",
+      "current_datetime",
+      "channel",
+      "unit_name",
+      "attendant_name",
+      "customer_name"
+    ],
+    "ai_derived_fields_recommended": [
+      "last_sender_role",
+      "hours_since_last_message",
+      "days_since_last_message",
+      "customer_has_open_question",
+      "seller_has_open_question",
+      "customer_showed_purchase_intent",
+      "customer_showed_service_intent",
+      "customer_showed_parts_intent",
+      "conversation_has_followup",
+      "conversation_has_complaint",
+      "conversation_has_goodbye_signal",
+      "conversation_has_scheduling_signal",
+      "conversation_has_payment_signal",
+      "conversation_has_trade_in_signal",
+      "conversation_has_document_request"
+    ],
+    "classification_output_schema": {
+      "_language_note": "Todos os valores de texto (strings) devem ser em portugues do Brasil (pt-BR)",
+      "conversation_id": "string_or_number",
+      "primary_category": "string",
+      "secondary_categories": ["string"],
+      "tags": ["string"],
+      "alerts": ["string (pt-BR obrigatorio)"],
+      "lead_status": "string",
+      "lead_temperature": "cold|warm|hot",
+      "priority": "low|medium|high|critical",
+      "recommended_action": "string (pt-BR obrigatorio)",
+      "recommended_action_reason": "string (pt-BR obrigatorio)",
+      "confidence": "number_0_to_1"
+    },
+    "categories": [
+      {
+        "id": "intencao_compra",
+        "label": "Intencao de Compra",
+        "color": "#22C55E",
+        "emoji": "🚗"
+      },
+      {
+        "id": "qualificacao_comercial",
+        "label": "Qualificacao Comercial",
+        "color": "#16A34A",
+        "emoji": "🎯"
+      },
+      {
+        "id": "negociacao_avanco",
+        "label": "Avanco de Negociacao",
+        "color": "#EAB308",
+        "emoji": "🤝"
+      },
+      {
+        "id": "pos_venda_servicos",
+        "label": "Pos-venda e Servicos",
+        "color": "#3B82F6",
+        "emoji": "🔧"
+      },
+      {
+        "id": "fluxo_atendimento",
+        "label": "Fluxo de Atendimento",
+        "color": "#8B5CF6",
+        "emoji": "🔀"
+      },
+      {
+        "id": "estado_conversa",
+        "label": "Estado da Conversa",
+        "color": "#F59E0B",
+        "emoji": "⏳"
+      },
+      {
+        "id": "risco_alerta",
+        "label": "Risco e Alertas",
+        "color": "#EF4444",
+        "emoji": "🚨"
+      },
+      {
+        "id": "problema_operacional",
+        "label": "Problemas Operacionais",
+        "color": "#F97316",
+        "emoji": "⚠️"
+      },
+      {
+        "id": "outros_contatos",
+        "label": "Outros Tipos de Contato",
+        "color": "#9CA3AF",
+        "emoji": "📌"
+      }
+    ],
+    "tags": [
+      {
+        "tag": "interesse_veiculo_novo",
+        "label": "Interesse em veiculo novo",
+        "category": "intencao_compra",
+        "color": "#22C55E",
+        "emoji": "🚗",
+        "priority": "high",
+        "description": "Cliente demonstra interesse em carro 0km ou pergunta por modelos novos.",
+        "activation_rules": [
+          "Cliente menciona 0km, novo, modelo novo ou quer conhecer carros novos",
+          "Cliente pergunta sobre modelos disponiveis para compra"
+        ],
+        "example_signals": [
+          "tenho interesse em 0km",
+          "quero saber sobre os modelos disponiveis",
+          "vocês tem WR-V novo?"
+        ],
+        "recommended_action": "encaminhar_para_vendas_ou_manter_em_negociacao"
+      },
+      {
+        "tag": "interesse_seminovo",
+        "label": "Interesse em seminovo",
+        "category": "intencao_compra",
+        "color": "#22C55E",
+        "emoji": "🚙",
+        "priority": "high",
+        "description": "Cliente procura veiculos usados ou seminovos.",
+        "activation_rules": [
+          "Cliente menciona seminovo, usado ou pede opcoes de carros usados"
+        ],
+        "example_signals": [
+          "quero ver seminovos",
+          "tem usado disponivel?"
+        ],
+        "recommended_action": "encaminhar_para_vendas_com_foco_em_estoque_de_seminovos"
+      },
+      {
+        "tag": "consulta_modelo_especifico",
+        "label": "Consulta de modelo especifico",
+        "category": "intencao_compra",
+        "color": "#22C55E",
+        "emoji": "🔎",
+        "priority": "high",
+        "description": "Cliente pergunta por um modelo especifico.",
+        "activation_rules": [
+          "Mensagem contem nome de modelo como WR-V, City, Civic, HR-V, Fit, CR-V"
+        ],
+        "example_signals": [
+          "voces tem WR-V?",
+          "quero o City EXL",
+          "tem HR-V disponivel?"
+        ],
+        "recommended_action": "responder_disponibilidade_preco_e_proximo_passo"
+      },
+      {
+        "tag": "consulta_preco",
+        "label": "Consulta de preco",
+        "category": "intencao_compra",
+        "color": "#22C55E",
+        "emoji": "💰",
+        "priority": "high",
+        "description": "Cliente pede valor de veiculo, peca ou servico.",
+        "activation_rules": [
+          "Cliente pergunta valor, preco, quanto custa"
+        ],
+        "example_signals": [
+          "qual o valor?",
+          "quanto custa?",
+          "me passa o preco"
+        ],
+        "recommended_action": "responder_preco_ou_simulacao_comercial"
+      },
+      {
+        "tag": "consulta_disponibilidade",
+        "label": "Consulta de disponibilidade",
+        "category": "intencao_compra",
+        "color": "#22C55E",
+        "emoji": "📦",
+        "priority": "high",
+        "description": "Cliente quer saber se ha estoque ou pronta entrega.",
+        "activation_rules": [
+          "Cliente pergunta se tem disponivel ou pronta entrega"
+        ],
+        "example_signals": [
+          "tem pronta entrega?",
+          "entrou algum civic?"
+        ],
+        "recommended_action": "confirmar_estoque_e_oferecer_visita_ou_test_drive"
+      },
+      {
+        "tag": "veiculo_na_troca",
+        "label": "Veiculo na troca",
+        "category": "qualificacao_comercial",
+        "color": "#16A34A",
+        "emoji": "🔄",
+        "priority": "high",
+        "description": "Cliente informa que possui carro para dar na troca.",
+        "activation_rules": [
+          "Cliente menciona trocar usado, avaliacao, carro na troca"
+        ],
+        "example_signals": [
+          "tenho um city 2014 para troca",
+          "quero colocar meu usado na troca"
+        ],
+        "recommended_action": "agendar_avaliacao_e_preparar_negociacao"
+      },
+      {
+        "tag": "interesse_financiamento",
+        "label": "Interesse em financiamento",
+        "category": "qualificacao_comercial",
+        "color": "#16A34A",
+        "emoji": "🏦",
+        "priority": "high",
+        "description": "Cliente quer financiamento, simulacao ou condicoes de pagamento.",
+        "activation_rules": [
+          "Cliente menciona financiamento, parcelas, taxa, banco, score"
+        ],
+        "example_signals": [
+          "quais os planos de pagamento?",
+          "quero financiar"
+        ],
+        "recommended_action": "gerar_simulacao_e_coletar_dados_necessarios"
+      },
+      {
+        "tag": "interesse_consorcio",
+        "label": "Interesse em consorcio",
+        "category": "qualificacao_comercial",
+        "color": "#16A34A",
+        "emoji": "🧾",
+        "priority": "medium",
+        "description": "Cliente menciona carta de credito, consorcio ou administradora.",
+        "activation_rules": [
+          "Cliente menciona consorcio ou administradora"
+        ],
+        "example_signals": [
+          "minha administradora e Sicredi",
+          "tenho carta de consorcio"
+        ],
+        "recommended_action": "seguir_fluxo_de_compra_com_consorcio"
+      },
+      {
+        "tag": "cliente_taxista",
+        "label": "Cliente taxista",
+        "category": "qualificacao_comercial",
+        "color": "#16A34A",
+        "emoji": "🚕",
+        "priority": "high",
+        "description": "Lead com contexto de compra para taxista.",
+        "activation_rules": [
+          "Cliente diz que e taxista",
+          "Cliente fala de isencoes para taxista"
+        ],
+        "example_signals": [
+          "sou taxista",
+          "qual valor para taxista?"
+        ],
+        "recommended_action": "aplicar_fluxo_comercial_de_taxista_e_isencoes"
+      },
+      {
+        "tag": "cliente_pcd",
+        "label": "Cliente PCD",
+        "category": "qualificacao_comercial",
+        "color": "#16A34A",
+        "emoji": "♿",
+        "priority": "high",
+        "description": "Lead com interesse em compra PCD e isencoes.",
+        "activation_rules": [
+          "Cliente menciona PCD, IPI, ICMS, isencao"
+        ],
+        "example_signals": [
+          "tenho interesse para PCD",
+          "ja tenho isencao de IPI"
+        ],
+        "recommended_action": "seguir_fluxo_PCD_e_apresentar_modelos_e_prazos"
+      },
+      {
+        "tag": "agendamento_visita_loja",
+        "label": "Agendamento de visita",
+        "category": "negociacao_avanco",
+        "color": "#EAB308",
+        "emoji": "📅",
+        "priority": "high",
+        "description": "Cliente aceita ou solicita visita a loja.",
+        "activation_rules": [
+          "Cliente combina dia ou horario para visitar a loja"
+        ],
+        "example_signals": [
+          "posso ir sexta 11h",
+          "vamos agendar uma visita"
+        ],
+        "recommended_action": "confirmar_horario_e_registrar_compromisso"
+      },
+      {
+        "tag": "interesse_test_drive",
+        "label": "Interesse em test drive",
+        "category": "negociacao_avanco",
+        "color": "#EAB308",
+        "emoji": "🧪",
+        "priority": "high",
+        "description": "Cliente aceita ou solicita test drive.",
+        "activation_rules": [
+          "Cliente menciona test drive ou conhecer pessoalmente"
+        ],
+        "example_signals": [
+          "quero agendar um test drive",
+          "posso conhecer o carro?"
+        ],
+        "recommended_action": "agendar_test_drive"
+      },
+      {
+        "tag": "envio_documentos",
+        "label": "Envio de documentos",
+        "category": "negociacao_avanco",
+        "color": "#EAB308",
+        "emoji": "📄",
+        "priority": "high",
+        "description": "Conversa envolve envio ou solicitacao de documentos para continuar processo.",
+        "activation_rules": [
+          "Atendente solicita CNH, documento do carro, CPF, email"
+        ],
+        "example_signals": [
+          "me envie sua CNH",
+          "preciso do documento do carro",
+          "me informe o CPF"
+        ],
+        "recommended_action": "acompanhar_pendencia_documental"
+      },
+      {
+        "tag": "avaliacao_veiculo_usado",
+        "label": "Avaliacao de usado",
+        "category": "negociacao_avanco",
+        "color": "#EAB308",
+        "emoji": "🔍",
+        "priority": "high",
+        "description": "Cliente levara ou quer levar o carro para avaliacao.",
+        "activation_rules": [
+          "Conversa cita avaliacao, laudo cautelar, vistoria"
+        ],
+        "example_signals": [
+          "quando posso levar para avaliacao?",
+          "precisa fazer laudo cautelar"
+        ],
+        "recommended_action": "agendar_avaliacao_e_controlar_pendencia"
+      },
+      {
+        "tag": "negociacao_pagamento",
+        "label": "Negociacao de pagamento",
+        "category": "negociacao_avanco",
+        "color": "#EAB308",
+        "emoji": "💳",
+        "priority": "high",
+        "description": "Conversa sobre cartao, boleto, debito, entrada ou formas de pagamento.",
+        "activation_rules": [
+          "Mensagem menciona pagamento, cartao, boleto, debito, entrada"
+        ],
+        "example_signals": [
+          "vou pagar no debito",
+          "pode ser boleto?"
+        ],
+        "recommended_action": "definir_forma_de_pagamento_e_avancar_para_fechamento"
+      },
+      {
+        "tag": "consulta_servico",
+        "label": "Consulta de servico",
+        "category": "pos_venda_servicos",
+        "color": "#3B82F6",
+        "emoji": "🔧",
+        "priority": "medium",
+        "description": "Cliente procura oficina, manutencao, orcamento ou reparo.",
+        "activation_rules": [
+          "Cliente pede servico tecnico, manutencao, reparo, oficina"
+        ],
+        "example_signals": [
+          "como funciona o orcamento?",
+          "preciso fazer reparo"
+        ],
+        "recommended_action": "encaminhar_para_servicos"
+      },
+      {
+        "tag": "agendamento_revisao",
+        "label": "Agendamento de revisao",
+        "category": "pos_venda_servicos",
+        "color": "#3B82F6",
+        "emoji": "📆",
+        "priority": "medium",
+        "description": "Cliente quer agendar revisao ou manutencao.",
+        "activation_rules": [
+          "Cliente pede agendamento de revisao"
+        ],
+        "example_signals": [
+          "gostaria de agendar revisao"
+        ],
+        "recommended_action": "direcionar_para_canal_de_agendamento_ou_confirmar_horario"
+      },
+      {
+        "tag": "consulta_pecas",
+        "label": "Consulta de pecas",
+        "category": "pos_venda_servicos",
+        "color": "#3B82F6",
+        "emoji": "⚙️",
+        "priority": "medium",
+        "description": "Cliente procura peca, acessorio ou item especifico.",
+        "activation_rules": [
+          "Cliente pergunta por oleo, fluido, tampa, acessorio, peca original"
+        ],
+        "example_signals": [
+          "qual o valor do fluido de freio?",
+          "quero tampa traseira HR-V 2017"
+        ],
+        "recommended_action": "encaminhar_para_pecas_e_responder_disponibilidade"
+      },
+      {
+        "tag": "diagnostico_problema_veiculo",
+        "label": "Problema tecnico no veiculo",
+        "category": "pos_venda_servicos",
+        "color": "#3B82F6",
+        "emoji": "🚗",
+        "priority": "medium",
+        "description": "Cliente relata defeito, barulho ou problema mecanico.",
+        "activation_rules": [
+          "Cliente relata falha, barulho, defeito, problema no carro"
+        ],
+        "example_signals": [
+          "meu carro esta com um barulho",
+          "esse cambio e CVT?"
+        ],
+        "recommended_action": "direcionar_para_diagnostico_ou_orcamento"
+      },
+      {
+        "tag": "atendimento_bot_inicial",
+        "label": "Atendimento inicial por bot",
+        "category": "fluxo_atendimento",
+        "color": "#8B5CF6",
+        "emoji": "🤖",
+        "priority": "low",
+        "description": "Conversa esta no fluxo inicial automatizado.",
+        "activation_rules": [
+          "Mensagens de boas-vindas, coleta de nome, cidade, unidade e menu"
+        ],
+        "example_signals": [
+          "seja bem-vindo",
+          "poderia me informar seu nome?"
+        ],
+        "recommended_action": "continuar_fluxo_automatizado_ou_transferir"
+      },
+      {
+        "tag": "transferencia_setor",
+        "label": "Transferencia de setor",
+        "category": "fluxo_atendimento",
+        "color": "#8B5CF6",
+        "emoji": "🔀",
+        "priority": "medium",
+        "description": "Atendimento foi encaminhado para vendas, servicos, pecas ou atendimento geral.",
+        "activation_rules": [
+          "Mensagem informa transferencia para equipe"
+        ],
+        "example_signals": [
+          "seu atendimento esta sendo transferido para a equipe de vendas"
+        ],
+        "recommended_action": "acompanhar_recebimento_pelo_setor_destino"
+      },
+      {
+        "tag": "solicitacao_vendedor_especifico",
+        "label": "Solicitacao de vendedor especifico",
+        "category": "fluxo_atendimento",
+        "color": "#8B5CF6",
+        "emoji": "👤",
+        "priority": "medium",
+        "description": "Cliente quer ser atendido por um vendedor especifico.",
+        "activation_rules": [
+          "Cliente menciona nome de atendente ou vendedor"
+        ],
+        "example_signals": [
+          "consigo falar com o Fabio?",
+          "quero falar com a Adriana"
+        ],
+        "recommended_action": "rotear_para_o_atendente_solicitado_quando_possivel"
+      },
+      {
+        "tag": "direcionamento_filial",
+        "label": "Direcionamento de filial",
+        "category": "fluxo_atendimento",
+        "color": "#8B5CF6",
+        "emoji": "🏢",
+        "priority": "low",
+        "description": "Conversa envolve definicao de unidade ou filial.",
+        "activation_rules": [
+          "Cliente informa cidade, bairro ou escolhe unidade"
+        ],
+        "example_signals": [
+          "confirma essa unidade?",
+          "qual filial funciona melhor para voce?"
+        ],
+        "recommended_action": "registrar_unidade_preferida"
+      },
+      {
+        "tag": "aguardando_resposta_vendedor",
+        "label": "Aguardando resposta do vendedor",
+        "category": "estado_conversa",
+        "color": "#F59E0B",
+        "emoji": "⏳",
+        "priority": "high",
+        "description": "Ultima mensagem foi do cliente e ainda nao houve retorno do vendedor.",
+        "activation_rules": [
+          "last_sender_role = customer",
+          "hours_since_last_message > 0",
+          "nao ha resposta posterior do vendedor"
+        ],
+        "time_logic": {
+          "initial_threshold_hours": 0.25,
+          "warning_threshold_hours": 1,
+          "critical_threshold_hours": 4
+        },
+        "recommended_action": "alertar_vendedor_para_resposta"
+      },
+      {
+        "tag": "aguardando_resposta_cliente",
+        "label": "Aguardando resposta do cliente",
+        "category": "estado_conversa",
+        "color": "#F59E0B",
+        "emoji": "⌛",
+        "priority": "medium",
+        "description": "Ultima mensagem foi do vendedor e o cliente ainda nao respondeu.",
+        "activation_rules": [
+          "last_sender_role = seller",
+          "nao ha resposta posterior do cliente"
+        ],
+        "time_logic": {
+          "initial_threshold_hours": 2,
+          "warning_threshold_hours": 24,
+          "critical_threshold_hours": 72
+        },
+        "recommended_action": "avaliar_followup"
+      },
+      {
+        "tag": "lead_sem_interacao",
+        "label": "Lead sem interacao",
+        "category": "estado_conversa",
+        "color": "#F59E0B",
+        "emoji": "💤",
+        "priority": "medium",
+        "description": "Conversa parada sem novas mensagens por periodo relevante.",
+        "activation_rules": [
+          "hours_since_last_message >= 24"
+        ],
+        "time_logic": {
+          "threshold_hours": 24
+        },
+        "recommended_action": "enfileirar_followup_automatico_ou_manual"
+      },
+      {
+        "tag": "lead_esfriando",
+        "label": "Lead esfriando",
+        "category": "estado_conversa",
+        "color": "#F59E0B",
+        "emoji": "🧊",
+        "priority": "medium",
+        "description": "Cliente responde com intervalo crescente ou perde intensidade de interacao.",
+        "activation_rules": [
+          "Tempo medio entre respostas do cliente esta aumentando",
+          "Ha reducao perceptivel de engajamento"
+        ],
+        "recommended_action": "priorizar_followup_com_valor_comercial"
+      },
+      {
+        "tag": "followup_recomendado",
+        "label": "Follow-up recomendado",
+        "category": "estado_conversa",
+        "color": "#F59E0B",
+        "emoji": "🔄",
+        "priority": "high",
+        "description": "Conversa parada mas ainda com potencial real de retomada.",
+        "activation_rules": [
+          "Lead demonstrou interesse comercial ou de servico",
+          "Conversa esta parada",
+          "Nao ha sinal claro de encerramento ou desinteresse"
+        ],
+        "recommended_action": "enviar_followup_personalizado"
+      },
+      {
+        "tag": "negociacao_ativa",
+        "label": "Negociacao ativa",
+        "category": "estado_conversa",
+        "color": "#F59E0B",
+        "emoji": "🤝",
+        "priority": "high",
+        "description": "Conversa recente, com trocas entre cliente e vendedor e proximo passo em aberto.",
+        "activation_rules": [
+          "Interacao recente entre ambas as partes",
+          "Existe objetivo comercial em andamento"
+        ],
+        "recommended_action": "manter_prioridade_operacional_alta"
+      },
+      {
+        "tag": "conversa_encerrada_natural",
+        "label": "Conversa encerrada naturalmente",
+        "category": "estado_conversa",
+        "color": "#9CA3AF",
+        "emoji": "📴",
+        "priority": "low",
+        "description": "Conversa terminou de forma natural, sem pendencia clara. Exemplo: cliente agradeceu e nao abriu nova demanda.",
+        "activation_rules": [
+          "Ultima mensagem indica fechamento cordial",
+          "Nao ha pergunta aberta",
+          "Nao ha pendencia operacional ou comercial explicita"
+        ],
+        "example_signals": [
+          "obrigado",
+          "ok obrigado",
+          "valeu",
+          "tudo certo",
+          "perfeito, obrigado"
+        ],
+        "recommended_action": "arquivar_ou_marcar_como_finalizada"
+      },
+      {
+        "tag": "conversa_finalizada_vendedor",
+        "label": "Conversa finalizada pelo vendedor",
+        "category": "estado_conversa",
+        "color": "#9CA3AF",
+        "emoji": "✔️",
+        "priority": "low",
+        "description": "Vendedor encerrou atendimento de forma explicita.",
+        "activation_rules": [
+          "Mensagem de encerramento claro enviada pelo vendedor",
+          "Nao existe nova pergunta do cliente"
+        ],
+        "recommended_action": "marcar_como_concluida"
+      },
+      {
+        "tag": "lead_abandonado",
+        "label": "Lead abandonado",
+        "category": "estado_conversa",
+        "color": "#9CA3AF",
+        "emoji": "📭",
+        "priority": "medium",
+        "description": "Cliente nao respondeu apos follow-up ou varias tentativas de contato.",
+        "activation_rules": [
+          "Cliente nao respondeu depois de um ou mais follow-ups",
+          "Tempo sem interacao ultrapassa janela definida pela operacao"
+        ],
+        "time_logic": {
+          "threshold_hours": 72
+        },
+        "recommended_action": "mover_para_reengajamento_ou_perdido_temporario"
+      },
+      {
+        "tag": "cliente_impaciente",
+        "label": "Cliente impaciente",
+        "category": "risco_alerta",
+        "color": "#EF4444",
+        "emoji": "😠",
+        "priority": "critical",
+        "description": "Cliente demonstra irritacao, cobranca ou insatisfacao com demora.",
+        "activation_rules": [
+          "Mensagem com tom de reclamacao por demora ou falta de retorno"
+        ],
+        "example_signals": [
+          "ainda esta por ai?",
+          "preciso de atendimento",
+          "estou aguardando"
+        ],
+        "recommended_action": "prioridade_maxima_de_resposta"
+      },
+      {
+        "tag": "risco_perda_cliente",
+        "label": "Risco de perda do cliente",
+        "category": "risco_alerta",
+        "color": "#EF4444",
+        "emoji": "🚨",
+        "priority": "critical",
+        "description": "Cliente ameaca desistir, encerrar compra ou ir ao concorrente.",
+        "activation_rules": [
+          "Cliente fala em concorrente, desistir, nao quer mais comprar, encerrar"
+        ],
+        "example_signals": [
+          "vou no concorrente",
+          "nao quero mais comprar com voces"
+        ],
+        "recommended_action": "escalacao_imediata_para_reversao"
+      },
+      {
+        "tag": "cliente_desiste",
+        "label": "Cliente desistiu",
+        "category": "risco_alerta",
+        "color": "#EF4444",
+        "emoji": "❌",
+        "priority": "high",
+        "description": "Cliente encerra atendimento ou declara que nao quer prosseguir.",
+        "activation_rules": [
+          "Cliente pede para encerrar ou recusa seguir"
+        ],
+        "example_signals": [
+          "encerrar atendimento",
+          "todas distantes",
+          "nao tenho interesse"
+        ],
+        "recommended_action": "marcar_como_perdido_ou_desinteresse"
+      },
+      {
+        "tag": "lead_em_risco",
+        "label": "Lead em risco",
+        "category": "risco_alerta",
+        "color": "#EF4444",
+        "emoji": "🆘",
+        "priority": "critical",
+        "description": "Cliente com pergunta aberta, sinal de interesse, mas sem retorno dentro do SLA.",
+        "activation_rules": [
+          "Cliente fez pergunta ou demonstrou intencao",
+          "vendedor nao respondeu no SLA"
+        ],
+        "time_logic": {
+          "warning_threshold_hours": 1,
+          "critical_threshold_hours": 4
+        },
+        "recommended_action": "alerta_urgente_e_resposta_prioritaria"
+      },
+      {
+        "tag": "falha_fluxo_bot",
+        "label": "Falha no fluxo do bot",
+        "category": "problema_operacional",
+        "color": "#F97316",
+        "emoji": "🤖",
+        "priority": "high",
+        "description": "Bot nao entende a mensagem ou repete etapa indevidamente.",
+        "activation_rules": [
+          "Mensagens repetidas de coleta de nome, bairro ou menu sem progresso",
+          "Cliente responde e bot nao interpreta corretamente"
+        ],
+        "recommended_action": "registrar_erro_de_fluxo_e_revisar_intencoes"
+      },
+      {
+        "tag": "loop_fluxo_bot",
+        "label": "Loop no fluxo do bot",
+        "category": "problema_operacional",
+        "color": "#F97316",
+        "emoji": "🔁",
+        "priority": "high",
+        "description": "Fluxo entra em repeticao ou encaminhamento inconsistente.",
+        "activation_rules": [
+          "Mesma pergunta ou mesma transferencia aparece mais de uma vez sem avancar"
+        ],
+        "recommended_action": "abrir_analise_tecnica_do_fluxo"
+      },
+      {
+        "tag": "mensagem_nao_suportada",
+        "label": "Mensagem nao suportada",
+        "category": "problema_operacional",
+        "color": "#F97316",
+        "emoji": "📵",
+        "priority": "medium",
+        "description": "Sistema nao conseguiu processar a mensagem recebida.",
+        "activation_rules": [
+          "Texto contem mensagem nao suportada ou equivalente"
+        ],
+        "recommended_action": "registrar_evento_tecnico"
+      },
+      {
+        "tag": "conversa_teste",
+        "label": "Conversa de teste",
+        "category": "problema_operacional",
+        "color": "#F97316",
+        "emoji": "🧪",
+        "priority": "medium",
+        "description": "Conversa claramente usada para homologacao, validacao ou teste interno.",
+        "activation_rules": [
+          "Mensagem menciona teste, fluxo, LP, integracao, web, app ou cenario de teste"
+        ],
+        "example_signals": [
+          "estou testando um cenario",
+          "utilizei o celular da minha filha para testar o fluxo"
+        ],
+        "recommended_action": "excluir_de_metricas_comerciais_ou_marcar_como_teste"
+      },
+      {
+        "tag": "parceiro_terceiro",
+        "label": "Contato de parceiro ou terceiro",
+        "category": "outros_contatos",
+        "color": "#9CA3AF",
+        "emoji": "🤝",
+        "priority": "medium",
+        "description": "Contato vem de seguradora, parceiro, despachante ou empresa terceira.",
+        "activation_rules": [
+          "Mensagem menciona seguradora, parceiro ou cadastro operacional externo"
+        ],
+        "example_signals": [
+          "sou da maximiza seguros",
+          "preciso de dados para cadastrar junto a Tokio"
+        ],
+        "recommended_action": "encaminhar_para_area_responsavel"
+      },
+      {
+        "tag": "lead_campanha_marketing",
+        "label": "Lead de campanha de marketing",
+        "category": "outros_contatos",
+        "color": "#9CA3AF",
+        "emoji": "📣",
+        "priority": "medium",
+        "description": "Lead originado de anuncio, landing page, campanha ou portal.",
+        "activation_rules": [
+          "Mensagem menciona campanha, anuncio, portal, LP, RD Station"
+        ],
+        "example_signals": [
+          "tenho interesse na campanha",
+          "recebi seu interesse no anuncio",
+          "fiz cadastro no site da WRV"
+        ],
+        "recommended_action": "preservar_origem_para_analise_de_marketing"
+      },
+      {
+        "tag": "solicitacao_informacao",
+        "label": "Solicitacao geral de informacao",
+        "category": "outros_contatos",
+        "color": "#9CA3AF",
+        "emoji": "ℹ️",
+        "priority": "low",
+        "description": "Cliente pede informacao geral sem demonstrar ainda uma intencao madura.",
+        "activation_rules": [
+          "Pergunta ampla sem especificacao de proximo passo"
+        ],
+        "recommended_action": "qualificar_intencao_e_aprofundar_necessidade"
+      }
+    ],
+    "lead_status_options": [
+      "novo_lead",
+      "em_qualificacao",
+      "em_negociacao",
+      "proposta_enviada",
+      "visita_agendada",
+      "documentacao_pendente",
+      "pos_venda",
+      "aguardando_cliente",
+      "aguardando_vendedor",
+      "encerrado",
+      "perdido",
+      "teste"
+    ],
+    "priority_rules": {
+      "critical": [
+        "risco_perda_cliente",
+        "cliente_impaciente",
+        "lead_em_risco"
+      ],
+      "high": [
+        "interesse_veiculo_novo",
+        "consulta_preco",
+        "consulta_modelo_especifico",
+        "veiculo_na_troca",
+        "interesse_financiamento",
+        "agendamento_visita_loja",
+        "interesse_test_drive",
+        "envio_documentos",
+        "avaliacao_veiculo_usado",
+        "aguardando_resposta_vendedor",
+        "followup_recomendado",
+        "negociacao_ativa"
+      ],
+      "medium": [
+        "aguardando_resposta_cliente",
+        "lead_sem_interacao",
+        "lead_esfriando",
+        "lead_abandonado",
+        "consulta_servico",
+        "agendamento_revisao",
+        "consulta_pecas",
+        "parceiro_terceiro",
+        "lead_campanha_marketing"
+      ],
+      "low": [
+        "conversa_encerrada_natural",
+        "conversa_finalizada_vendedor",
+        "atendimento_bot_inicial",
+        "direcionamento_filial",
+        "solicitacao_informacao"
+      ]
+    },
+    "automation_suggestions": [
+      {
+        "when_tag": "aguardando_resposta_vendedor",
+        "action": "notificar_vendedor"
+      },
+      {
+        "when_tag": "lead_em_risco",
+        "action": "escalar_para_supervisao"
+      },
+      {
+        "when_tag": "lead_sem_interacao",
+        "action": "enviar_followup"
+      },
+      {
+        "when_tag": "conversa_encerrada_natural",
+        "action": "arquivar_conversa"
+      },
+      {
+        "when_tag": "conversa_teste",
+        "action": "excluir_de_relatorios_comerciais"
+      },
+      {
+        "when_tag": "cliente_desiste",
+        "action": "marcar_como_perdido"
+      }
+    ]
+  }

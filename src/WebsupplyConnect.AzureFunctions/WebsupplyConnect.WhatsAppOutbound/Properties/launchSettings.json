@@ -1,0 +1,9 @@
+{
+  "profiles": {
+    "WebsupplyConnect.WhatsAppOutbound": {
+      "commandName": "Project",
+      "commandLineArgs": "--port 7098",
+      "launchBrowser": false
+    }
+  }
+}

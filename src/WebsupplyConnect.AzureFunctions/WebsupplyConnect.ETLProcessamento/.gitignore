@@ -1,0 +1,5 @@
+# Azure Functions local settings (contém secrets - copiar de local.settings.example.json)
+local.settings.json
+
+# Azurite local storage emulator data
+azurite-data/
