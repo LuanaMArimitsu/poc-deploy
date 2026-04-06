@@ -489,7 +489,6 @@ $RECYCLE.BIN/
 
 # Azure Functions local settings
 **/local.settings.json
-/src/WebsupplyConnect.API/Tools
 
 # Sensitive appsettings
 **/appsettings.Development.json

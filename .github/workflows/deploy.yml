@@ -1,9 +1,11 @@
-name: Build and deploy to Development
+name: Build and deploy ASP.Net Core app to Azure Web App - poc-lfs-deploy
+
 on:
   push:
     branches:
-      - Development
+      - main
   workflow_dispatch:
+
 jobs:
   build:
     runs-on: windows-latest
@@ -12,6 +14,12 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+        with:
+          lfs: true
+      - name: Verificar ffmpeg no repo
+        run: |
+          dir src\WebsupplyConnect.API\Tools\ffmpeg.exe
+          (Get-Item src\WebsupplyConnect.API\Tools\ffmpeg.exe).Length
       - name: Setup .NET
         uses: actions/setup-dotnet@v4
         with:
@@ -22,11 +30,16 @@ jobs:
         run: dotnet build src/WebsupplyConnect.API --configuration Release --no-restore
       - name: Publish application
         run: dotnet publish src/WebsupplyConnect.API --configuration Release --output ./publish --self-contained --runtime win-x64 --no-restore
+      - name: Verificar ffmpeg no publish
+        run: |
+          dir publish\Tools\ffmpeg.exe
+          (Get-Item publish\Tools\ffmpeg.exe).Length
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v4
         with:
           name: .net-app
           path: ./publish
+
   deploy:
     runs-on: windows-latest
     needs: build
@@ -42,13 +55,13 @@ jobs:
       - name: Login to Azure
         uses: azure/login@v2
         with:
-          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_91463E9B3E4746DD9257405765CB5EC2 }}
-          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_F905A5E29F464A918464685E08578E48 }}
-          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_508AF7EA80AE4AF8B4C0885F8F5D15CF }}
+          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_63A6E136A49D4E37826E18D65C0516EA }}
+          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_D5740ED3CEA44125940AB363C644C670 }}
+          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_06C9CBD2D093479883E4ACBAD7A4DB8C }}
       - name: Deploy to Azure Web App
         id: deploy-to-webapp
         uses: azure/webapps-deploy@v3
         with:
-          app-name: 'websupplyconnect'
-          slot-name: 'dev'
+          app-name: 'poc-lfs-deploy'
+          slot-name: 'Production'
           package: ./publish
