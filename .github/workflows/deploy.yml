@@ -1,4 +1,4 @@
-name: Build and deploy ASP.Net Core app to Azure Web App - poc-lfs-deploy
+name: Build and deploy poc-lfs-deploy
 
 on:
   push:
