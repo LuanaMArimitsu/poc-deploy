@@ -17,7 +17,6 @@ using WebsupplyConnect.Domain.Entities.Permissao;
 using WebsupplyConnect.Domain.Entities.Produto;
 using WebsupplyConnect.Domain.Entities.Usuario;
 using WebsupplyConnect.Domain.Entities.VersaoApp;
-using WebsupplyConnect.Infrastructure.Data.Seeds;
 
 namespace WebsupplyConnect.Infrastructure.Data
 {
@@ -188,10 +187,10 @@ namespace WebsupplyConnect.Infrastructure.Data
             modelBuilder.ApplyConfigurationsFromAssembly(typeof(WebsupplyConnectDbContext).Assembly);
 
             // Applicação dos dados iniciais (seeds)
-            TipificacaoSeeds.ConfigurarTodosTipificacoes(modelBuilder);
+            //TipificacaoSeeds.ConfigurarTodosTipificacoes(modelBuilder);
 
             // Aplicação dos dados iniciais de feriados
-            FeriadoSeeds.ConfigurarTodosFeriados(modelBuilder);
+            //FeriadoSeeds.ConfigurarTodosFeriados(modelBuilder);
 
             //impede exclusões em cascata automáticas
             foreach (var relationship in modelBuilder.Model.GetEntityTypes().SelectMany(e => e.GetForeignKeys()))
